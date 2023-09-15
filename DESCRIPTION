@@ -1,0 +1,11 @@
+Package: Lab4
+Type: Package
+Title: Lab 4 - 
+Version: 1.0
+Date: 2023-09-15
+Depends: R (>= 3.4)
+Author: Birgit Karlhuber <birgit@karlhuber.net> and Daniele Bozzoli <danbo826@student.liu.se>
+Maintainer: Birgit Karlhuber <birgit@karlhuber.net> and Daniele Bozzoli <danbo826@student.liu.se>
+Description: More about what it does (maybe more than one line)
+License: GPL (>= 2) | file LICENCE
+RoxygenNote: 7.2.3
