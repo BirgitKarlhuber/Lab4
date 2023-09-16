@@ -1,21 +1,53 @@
-#' Algorithm to find the shortest path from an initial node to all other nodes in a graph
+#' Function for a multiple regression model
 #' 
-#' The algorithm takes a graph and an initial node and calculates the shortest path from the initial node to every other node in the graph.
-#'
-#' @param graph data.frame with three variables (v1, v2 and w) that contains the 
-#' edges of the graph (from v1 to v2) with the weight of the edge (w).
 #' 
-#' @param init_node A number corresponding to the start node
 #'
-#' @return The shortest path to every other node from the starting node as a vector.
+#' @param formula an object of class 'fromula': a symbolic decription of the model to be fitted.
+#' 
+#' @param data an 'data.frame' containing the variables in the model. 
+#'
+#' @return Returns an object of class 'linreg'. 
+#' 
+#' @examples
+#' data("iris")
+#' linear_model <- linreg(Petal.Length~Sepal.Width+Sepal.Length, data=iris)
 #' 
 #' @export
-#' 
-#' 
-#' @seealso \url{https://en.wikipedia.org/wiki/Dijkstra’s_algorithm}
 
 
-linreg <- function(){
+linreg <- function(formula, data){
+  stopifnot(class(formula)=="formula")
   
+  X <- as.matrix(model.matrix(formula, data))
+  y <- as.matrix(data[all.vars(formula, max.names=1)])
+  
+  beta_hat <- solve(t(X)%*%X)%*%t(X)%*%y # regression coefficient
+  y_hat <- X%*%beta_hat # fitted_values
+  e_hat <- y-y_hat# residuals
+  
+  n <- nrow(data) # number of observations
+  p <- ncol(X) # number of parameters in the model
+  df <- n-p
+  
+  sigma2_hat <- as.numeric((t(e_hat)%*%e_hat)/df) # residual variance
+  
+  est_var_sigma2_hat <- sigma2_hat*(solve(t(X)%*%X)) # variance of the regression coefficients
+  t_beta <- beta_hat/sqrt(diag(est_var_sigma2_hat)) # t-values for each coefficient
+  
+  # still missing !!!!!!!!!!!!!!!!!!!!!!! - hint pt() function
+  p_value <- 3 # p-values for each coefficent
+  
+  # Create object
+  object <- data.frame(beta_hat, e_hat, y_hat, df, sigma2_hat, 
+                       est_var_sigma2_hat, t_beta, p_value)
+  names(object) <- c("coefficients", "residuals", "fitted.values", 
+                     "df.residuals", "residual.variance", "coefficient.variance",
+                     "t.values", "p.values")
+  
+  class (object) <- "linreg"
+  return(object)
 }
+
+data("iris")
+linear_model <- linreg(Petal.Length~Sepal.Width+Sepal.Length, data=iris)
 
