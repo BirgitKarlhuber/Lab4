@@ -34,20 +34,23 @@ linreg <- function(formula, data){
   est_var_sigma2_hat <- sigma2_hat*(solve(t(X)%*%X)) # variance of the regression coefficients
   t_beta <- beta_hat/sqrt(diag(est_var_sigma2_hat)) # t-values for each coefficient
   
-  # still missing !!!!!!!!!!!!!!!!!!!!!!! - hint pt() function
-  p_value <- 3 # p-values for each coefficent
+  p_value <- 2*pt(-abs(t_beta),df=n-1) # p-value for each regression coefficient
   
-  # Create object
-  object <- data.frame(beta_hat, e_hat, y_hat, df, sigma2_hat, 
-                       est_var_sigma2_hat, t_beta, p_value)
-  names(object) <- c("coefficients", "residuals", "fitted.values", 
-                     "df.residuals", "residual.variance", "coefficient.variance",
-                     "t.values", "p.values")
+  # Create Class
+  linreg <- setRefClass ("linreg",
+                         fields = list ( coefficients = "matrix", residuals = "matrix",
+                                         fitted.values = "matrix", df.residuals = "numeric",
+                                         residual.variance = "numeric", coefficient.variance = "matrix",
+                                         t.values = "numeric", p.values = "numeric")
+  )
   
-  class (object) <- "linreg"
+  object <- linreg$new(coefficients=beta_hat, residuals=e_hat, 
+                       fitted.values=y_hat,df.residuals=df, 
+                       residual.variance=sigma2_hat, coefficient.variance=est_var_sigma2_hat,
+                       t.values=as.numeric(t_beta), p.values=as.numeric(p_value))
+  
   return(object)
 }
 
-data("iris")
-linear_model <- linreg(Petal.Length~Sepal.Width+Sepal.Length, data=iris)
-
+# data("iris")
+# linear_model <- linreg(Petal.Length~Sepal.Width+Sepal.Length, data=iris)
