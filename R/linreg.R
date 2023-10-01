@@ -17,89 +17,130 @@
 #' library(Lab4)
 #' linear_model <- linreg(Petal.Length~Sepal.Width+Sepal.Length, data=iris)
 
+# RC class object
+linreg <- setRefClass("linreg",
+                      fields = list (formula = "formula",
+                                     data = "data.frame",
+                                     data_name = "character",
+                                     coefficients = "matrix",
+                                     residuals = "matrix",
+                                     fitted.values = "matrix",
+                                     n.obs = "numeric",
+                                     n.par = "numeric",
+                                     df.residuals = "numeric",
+                                     residual.variance = "numeric",
+                                     coefficient.variance = "matrix",
+                                     t.values = "matrix",
+                                     p.values = "matrix"))
 
-linreg <- function(formula, data){
-  stopifnot(class(formula)=="formula", is.data.frame(data))
+# methods for the RC class object
+linreg$methods(
+  initialize = function(formula, data){
+    stopifnot(class(formula)=="formula", is.data.frame(data))
+    
+    .self$formula <<- formula
+    .self$data <<- data
+    .self$data_name <<-deparse(substitute(data))
+    
+    X <- as.matrix(model.matrix(formula, data))
+    y <- as.matrix(data[all.vars(formula, max.names=1)])
+    
+    .self$coefficients <<- solve(t(X)%*%X)%*%t(X)%*%y # regression coefficient
+    .self$fitted.values <<- round(X%*%coefficients,3) # fitted_values
+    .self$residuals <<- y-fitted.values # residuals
+    .self$n.obs <<- nrow(data) # number of observations
+    .self$n.par <<- ncol(X) # number of parameters in the model
+    .self$df.residuals <<- n.obs - n.par # degrees of freedom
+    .self$residual.variance <<- as.numeric((t(residuals)%*%residuals)/df.residuals) # residual variance
+    .self$coefficient.variance <<- residual.variance*(solve(t(X)%*%X)) # variance of the regression coefficients
+    .self$t.values <<- coefficients/sqrt(diag(coefficient.variance)) # t-values for each coefficient
+    .self$p.values <<- 2*pt(-abs(t.values),n.obs-1) # p-value for each regression coefficient
+  },
   
-  X <- as.matrix(model.matrix(formula, data))
-  y <- as.matrix(data[all.vars(formula, max.names=1)])
-  
-  beta_hat <- solve(t(X)%*%X)%*%t(X)%*%y # regression coefficient
- 
-  y_hat <- round(X%*%beta_hat,3) # fitted_values
-  e_hat <- y-y_hat # residuals
-  
-  n <- nrow(data) # number of observations
-  p <- ncol(X) # number of parameters in the model
-  df <- n-p
-  
-  sigma2_hat <- as.numeric((t(e_hat)%*%e_hat)/df) # residual variance
-  
-  est_var_sigma2_hat <- sigma2_hat*(solve(t(X)%*%X)) # variance of the regression coefficients
-  t_beta <- beta_hat/sqrt(diag(est_var_sigma2_hat)) # t-values for each coefficient
-  
-  p_value <- 2*pt(-abs(t_beta),df=n-1) # p-value for each regression coefficient
-  
-  
-  # RC class object
-  linreg <- setRefClass("linreg",
-                        fields = list (coefficients = "matrix", residuals = "matrix",
-                                       fitted.values = "matrix", df.residuals = "numeric",
-                                       residual.variance = "numeric", coefficient.variance = "matrix",
-                                       t.values = "numeric", p.values = "numeric")
-  )
-  
-  # methods for the RC class object
-  linreg$methods(
-    print = function(){
-      cat(paste0(dimnames(as.vector(coefficients))[[1]]))
-      cat(paste0(coefficients))
+  print = function(){
+    char_formula <- as.character(formula)
+    coef <- as.vector(coefficients)
+    names(coef) <- rownames(coefficients)
+    
+    cat(paste("linreg(formula = ", char_formula[2]," ", char_formula[1], " ",
+        char_formula[3], ", data = ", data_name,")\n\nCoefficients:\n",sep=""))
+    base::print(coef)
     },
-    
-    plot = function(x){
-      med_group <- aggregate(x$residuals,         # Median by group
-                             list(x$fitted.values),
-                             median)
-      
-      df <- data.frame(fitted.values=med_group[,1], residuals=med_group[,2])
-      
-      ggplot2::ggplot(x, aes(fitted.values(x), residuals(x))) + 
-        theme_bw() + 
-        theme(panel.border = element_blank(), panel.grid.major = element_blank(),
-              panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) +
-        geom_point(shape=1, size=2) +
-        geom_hline(yintercept = 0, linetype = "dotted", color="grey") +
-        geom_line(df, color="red") +
-        labs(title='Residuals vs Fitted', 
-             x=expression(paste("Fitted values \n lm(", formula, ")")), y='Residuals')
-    }, # second plot is missing
-    
-    resid = function(){
-      # retunr e_hat
-    }, 
-    
-    pred = function(){
-      # return y_hat
-    }, 
-    
-    coef = function(){
-      # coefficients as a named vector
-    }, 
-    
-    summary = function(){
-      # return a similar printout as printed for lm objects ...
-    }
-  )
   
-  # create new object of class 'linreg' - with values (return this)
-  object <- linreg$new(coefficients=beta_hat, residuals=e_hat, 
-                       fitted.values=y_hat, df.residuals=df, 
-                       residual.variance=sigma2_hat, coefficient.variance=est_var_sigma2_hat,
-                       t.values=as.numeric(t_beta), p.values=as.numeric(p_value))
-  return(object)
-}
+  plot = function(){
+    med_group <- aggregate(residuals,         # Median by group
+                           list(fitted.values),
+                           median)
+    df <- data.frame(fitted.values=med_group[,1], residuals=med_group[,2])
+    char_formula <- as.character(formula)
+    
+    plotA <- ggplot2::ggplot(data = data, mapping = aes(fitted.values, residuals)) + 
+      theme_bw() + 
+      theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+            panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) +
+      geom_point(shape=1, size=2) +
+      geom_hline(yintercept = 0, linetype = "dotted", color="grey") +
+      geom_line(mapping = aes(x = fitted.values, y = residuals), data = df,
+                colour = 'red') +
+      labs(title='Residuals vs Fitted', 
+           x=paste("Fitted values \n lm(", char_formula[2], char_formula[1], 
+                   char_formula[3], ")"), 
+           y='Residuals')
+    
+    # second graph
+    med_group2 <- aggregate(sqrt(abs(residuals/sd(residuals))),         # Median by group
+                            list(fitted.values),
+                            median)
+    df2 <- data.frame(fitted.values=med_group2[,1], std.residuals=med_group2[,2])
+
+    plotB <- ggplot2::ggplot(data, aes(fitted.values, sqrt(abs(residuals/sd(residuals))))) + 
+      theme_bw() + 
+      theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+            panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) +
+      geom_point(shape=1, size=2) +
+      geom_line(mapping = aes(x = fitted.values, y = std.residuals), data = df2,
+                colour = 'red') +
+      labs(title='Scale-Location', 
+           x=paste("Fitted values \n lm(", char_formula[2], char_formula[1], 
+                   char_formula[3], ")"), 
+           y=expression(sqrt(abs('Standardized residuals')))
+           )
+    return(list(plotA,plotB))
+  },
+  
+  resid = function(){
+    return(residuals)
+  }, 
+  
+  pred = function(){
+    return(fitted.values)
+  }, 
+  
+  coef = function(){
+    coef <- as.vector(coefficients)
+    names(coef) <- rownames(coefficients)
+    return(coef)
+  }, 
+  
+  summary = function(){
+    coef_names <- rownames(coefficients)
+    coef_sd <- sqrt(diag(coefficient.variance))
+    
+    for(i in 1:length(coef_names)){
+      cat(coef_names[i], round(coefficients[i],4), round(coef_sd[i],4), round(t.values[i],4),
+          p.values[i],sep=" ")
+    }
+    cat("\n\n", "Residual standard error:", round(sqrt(residual.variance),4), "on", 
+        df.residuals,"degrees of freedom")
+  }
+) 
 
 # data("iris")
-# mod_object <- linreg(Petal.Length~Species, data = iris)
-# print(mod_object)
-# plot(mod_object)
+# library(ggplot2)
+# 
+# mod_object <- linreg(Petal.Length~Sepal.Width+Sepal.Length, data = iris)
+# mod_object$print()
+# mod_object$resid()
+# mod_object$plot()
+# mod_object$coef()
+# mod_object$summary()
