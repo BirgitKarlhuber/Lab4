@@ -128,9 +128,9 @@ linreg$methods(
     
     for(i in 1:length(coef_names)){
       cat(coef_names[i], round(coefficients[i],4), round(coef_sd[i],4), round(t.values[i],4),
-          p.values[i],sep=" ")
+          p.values[i], "\n",sep=" ")
     }
-    cat("\n\n", "Residual standard error:", round(sqrt(residual.variance),4), "on", 
+    cat("\n", "Residual standard error:", round(sqrt(residual.variance),4), "on", 
         df.residuals,"degrees of freedom")
   }
 ) 
