@@ -10,7 +10,7 @@
 #' 
 #' @import ggplot2
 #'
-#' @export
+#' @export 
 #' 
 #' @examples
 #' data("iris")
@@ -63,9 +63,9 @@ linreg$methods(
     names(coef) <- rownames(coefficients)
     
     cat(paste("linreg(formula = ", char_formula[2]," ", char_formula[1], " ",
-        char_formula[3], ", data = ", data_name,")\n\nCoefficients:\n",sep=""))
+              char_formula[3], ", data = ", data_name,")\n\nCoefficients:\n",sep=""))
     base::print(coef)
-    },
+  },
   
   plot = function(){
     med_group <- aggregate(residuals,         # Median by group
@@ -92,7 +92,7 @@ linreg$methods(
                             list(fitted.values),
                             median)
     df2 <- data.frame(fitted.values=med_group2[,1], std.residuals=med_group2[,2])
-
+    
     plotB <- ggplot2::ggplot(data, aes(fitted.values, sqrt(abs(residuals/sd(residuals))))) + 
       theme_bw() + 
       theme(panel.border = element_blank(), panel.grid.major = element_blank(),
@@ -104,7 +104,7 @@ linreg$methods(
            x=paste("Fitted values \n lm(", char_formula[2], char_formula[1], 
                    char_formula[3], ")"), 
            y=expression(sqrt(abs('Standardized residuals')))
-           )
+      )
     return(list(plotA,plotB))
   },
   
@@ -147,19 +147,6 @@ linreg$methods(
     
     cat("\n", "Residual standard error:", round(sqrt(residual.variance),4), "on", 
         df.residuals,"degrees of freedom")
-   
   }
 ) 
-
-# data("iris")
-# library(ggplot2)
-# 
-# mod_object <- linreg(Petal.Length~Sepal.Width+Sepal.Length, data = iris)
-# mod_object$print()
-# mod_object$resid()
-# mod_object$plot()
-# mod_object$coef()
-# mod_object$summary()
-
-
 

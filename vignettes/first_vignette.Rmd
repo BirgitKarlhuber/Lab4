@@ -15,13 +15,12 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-# install.packages("Lab4")
 library(Lab4)
 ```
 
 Most of this information is available scattered throughout the R documentation. This appendix brings it all together in one place. 
 
-This R package is created to handle linear regression models. With the linreg() function a linear regression model is created. The function takes two arguments formula and data and returns an object of class linreg. Special functions such as print(), plot(), resid(), pred(), coef() and summary() can be used to get more information about the linear regression model. 
+This R package is created to handle linear regression models. With the [linreg] package a linear regression model is created. The function takes two arguments formula and data and returns an object of class [linreg]. Special functions such as `print()`,`plot()`,`resid()`, `pred()`,`coef()` and `summary()` can be used to get more information about the linear regression model. 
 
 
 
@@ -29,32 +28,32 @@ This R package is created to handle linear regression models. With the linreg() 
 We'll start by creating a simple linear regression model. 
 
 ### load data
-First load the data you want to analyse. In this vignette the well known dataset iris is used for demonstration. 
+First load the data you want to analyse. In this vignette the well known dataset `iris` is used for demonstration. 
 ```{r}
 data("iris")
 ```
 
 
 ### create linear regression model
-In the next step we call our function linreg() with the arguments formula = Petal.Length~Sepal.Width+Sepal.Length and data = iris. We save the returned linreg-object in the variable mod_object. 
+In the next step we call our class [linreg] with the arguments formula = Petal.Length~Sepal.Width+Sepal.Length and data = iris. We save the returned linreg-object in the variable mod_object. 
 ```{r}
 
-mod_object <- linreg(Petal.Length~Sepal.Width+Sepal.Length, data = iris)
+mod_object <- linreg$initialize(Petal.Length~Sepal.Width+Sepal.Length, data = iris)
 
 ```
 
 # use functions
 In the next step we can now use the different functions to get a better insight into our linear regression model. 
 
-1. $print()
-The $print() functions gives us the coefficients and coefficient names of our model. 
+1. `$print()`
+The `$print()` functions gives us the coefficients and coefficient names of our model. 
 ```{r}
 mod_object$print()
 ```
 
 
-2. $plot()
-The $plot() functions returns two diagnostic plots for linear regression models. 
+2. `$plot()`
+The `$plot()` functions returns two diagnostic plots for linear regression models. 
 
 ```{r}
 mod_object$plot()
@@ -65,29 +64,29 @@ The first plot (Residuals vs Fitted) shows if residuals have non-linear patterns
 The Scale-Location plot shows if residuals are spread equally along the ranges of predictors. So we can check if the assumption of homoscedasticity (equal variance) is fulfilled. It's good if we see a horizontal line with equally (randomly) spread points. 
 
 
-3. $resid()
-The $resid() functions gives us the residuals (\hat{e}) of the model. Residuals are essentially the difference between the actual observed response values and the response values that the model predicted.
+3. `$resid()`
+The `$resid()` functions gives us the residuals (\hat{e}) of the model. Residuals are essentially the difference between the actual observed response values and the response values that the model predicted.
 ```{r}
 mod_object$resid()
 ```
 
 
-4. $pred()
-The $pred() functions gives us the predicted response values (\hat{y}) of the model. 
+4. `$pred()`
+The `$pred()` functions gives us the predicted response values (\hat{y}) of the model. 
 ```{r}
 mod_object$pred()
 ```
 
 
-5. $coef()
-The $coef() functions gives us the coefficients of the model as a names vector. 
+5. `$coef()`
+The `$coef()` functions gives us the coefficients of the model as a names vector. 
 ```{r}
 mod_object$coef()
 ```
 
 
-6. $summary()
-The $summary() functions gives us a short overview of our model. It returns the coefficients with their standard error, t-value and p-value as well as the estimate of \hat{\sigma} and the degrees of freedom in the model. 
+6. `$summary()` 
+The `$summary()` functions gives us a short overview of our model. It returns the coefficients with their standard error, t-value and p-value as well as the estimate of \hat{\sigma} and the degrees of freedom in the model. 
 ```{r}
 mod_object$summary()
 ```
