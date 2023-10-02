@@ -150,4 +150,3 @@ linreg$methods(
         df.residuals,"degrees of freedom")
   }
 ) 
-
