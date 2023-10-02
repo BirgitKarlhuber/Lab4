@@ -16,6 +16,7 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(Lab4)
+library(ggplot2)
 ```
 
 Most of this information is available scattered throughout the R documentation. This appendix brings it all together in one place. 
@@ -24,7 +25,7 @@ This R package is created to handle linear regression models. With the [linreg] 
 
 
 
-## simplest example
+## simple example
 We'll start by creating a simple linear regression model. 
 
 ### load data
@@ -37,9 +38,8 @@ data("iris")
 ### create linear regression model
 In the next step we call our class [linreg] with the arguments formula = Petal.Length~Sepal.Width+Sepal.Length and data = iris. We save the returned linreg-object in the variable mod_object. 
 ```{r}
-
+linreg <- getFromNamespace("linreg", "Lab4")
 mod_object <- linreg(Petal.Length~Sepal.Width+Sepal.Length, data = iris)
-
 ```
 
 # use functions

@@ -20,5 +20,6 @@ Package to handle linear regression models
 \examples{
 data("iris")
 library(Lab4)
+linreg <- getFromNamespace("linreg", "Lab4")
 linear_model <- linreg(Petal.Length~Sepal.Width+Sepal.Length, data=iris)
 }
