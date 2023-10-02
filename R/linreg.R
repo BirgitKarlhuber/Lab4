@@ -1,6 +1,6 @@
 #' Function for a multiple regression model
 #' 
-#' test test test test test test test test test test test test test test test test test test test test test test 
+#' Package to handle linear regression models 
 #'
 #' @param formula an object of class 'formula': a symbolic description of the model to be fitted.
 #' 
@@ -127,11 +127,27 @@ linreg$methods(
     coef_sd <- sqrt(diag(coefficient.variance))
     
     for(i in 1:length(coef_names)){
-      cat(coef_names[i], round(coefficients[i],4), round(coef_sd[i],4), round(t.values[i],4),
-          p.values[i], "\n",sep=" ")
+      if(p.values[i] >= 0.1){
+        cat(paste(coef_names[i], round(coefficients[i],4), round(coef_sd[i],4), round(t.values[i],4),
+                  sprintf("%.5f", p.values[i]), sep=" "),"", "\n")
+      } else if(p.values[i] >= 0.05){
+        cat(paste(coef_names[i], round(coefficients[i],4), round(coef_sd[i],4), round(t.values[i],4),
+                  sprintf("%.5f", p.values[i]), sep=" "),".", "\n")
+      } else if(p.values[i] >= 0.01){
+        cat(paste(coef_names[i], round(coefficients[i],4), round(coef_sd[i],4), round(t.values[i],4),
+                  sprintf("%.5f", p.values[i]), sep=" "),"*", "\n")
+      } else if(p.values[i] >= 0.001){
+        cat(paste(coef_names[i], round(coefficients[i],4), round(coef_sd[i],4), round(t.values[i],4),
+                  sprintf("%.5f", p.values[i]), sep=" "),"**", "\n")
+      } else {
+        cat(paste(coef_names[i], round(coefficients[i],4), round(coef_sd[i],4), round(t.values[i],4),
+                  sprintf("%.5f", p.values[i]), sep=" "),"***", "\n")
+      }
     }
+    
     cat("\n", "Residual standard error:", round(sqrt(residual.variance),4), "on", 
         df.residuals,"degrees of freedom")
+   
   }
 ) 
 
@@ -144,3 +160,6 @@ linreg$methods(
 # mod_object$plot()
 # mod_object$coef()
 # mod_object$summary()
+
+
+
