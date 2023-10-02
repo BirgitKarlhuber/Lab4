@@ -38,7 +38,7 @@ data("iris")
 In the next step we call our class [linreg] with the arguments formula = Petal.Length~Sepal.Width+Sepal.Length and data = iris. We save the returned linreg-object in the variable mod_object. 
 ```{r}
 
-mod_object <- linreg$initialize(Petal.Length~Sepal.Width+Sepal.Length, data = iris)
+mod_object <- linreg(Petal.Length~Sepal.Width+Sepal.Length, data = iris)
 
 ```
 
